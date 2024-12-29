@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽卡模擬網站</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>歡迎來到抽卡模擬網站</h1>
+        <div id="auth-section">
+            <h2>註冊或登入</h2>
+            <form id="register-form">
+                <h3>註冊</h3>
+                <input type="text" id="reg-username" placeholder="用戶名" required>
+                <input type="password" id="reg-password" placeholder="密碼" required>
+                <button type="button" id="register-btn">註冊</button>
+            </form>
+            <form id="login-form">
+                <h3>登入</h3>
+                <input type="text" id="login-username" placeholder="用戶名" required>
+                <input type="password" id="login-password" placeholder="密碼" required>
+                <button type="button" id="login-btn">登入</button>
+            </form>
+        </div>
+
+        <div id="gacha-section" style="display:none;">
+            <h2>抽卡模擬</h2>
+            <button id="draw-card">抽一張卡</button>
+            <div id="result"></div>
+            <button id="logout-btn">登出</button>
+        </div>
+    </div>
+
+    <script>
+        // 註冊請求
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `username=${username}&password=${password}`
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        // 登入請求
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `username=${username}&password=${password}`
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('gacha-section').style.display = 'block';
+            }
+            alert(result.message);
+        });
+
+        // 抽卡請求
+        document.getElementById('draw-card').addEventListener('click', async () => {
+            const response = await fetch('/draw', { method: 'POST' });
+            const data = await response.json();
+            document.getElementById('result').textContent = `你抽到的是：${data.card}`;
+        });
+
+        // 登出請求
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
